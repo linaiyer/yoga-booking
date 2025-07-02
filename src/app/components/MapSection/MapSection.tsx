@@ -1,8 +1,9 @@
 "use client";
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Map from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import styles from './MapSection.module.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 const studios = [
   {
@@ -55,6 +56,11 @@ export default function MapSection() {
         .setLngLat([studio.longitude, studio.latitude])
         .addTo(mapRef.current);
     });
+    // Add zoom controls
+    if (!mapRef.current._navControl) {
+      mapRef.current._navControl = new maplibregl.NavigationControl();
+      mapRef.current.addControl(mapRef.current._navControl, 'top-right');
+    }
   }
 
   return (
@@ -63,7 +69,7 @@ export default function MapSection() {
         initialViewState={viewState}
         onMove={evt => setViewState(evt.viewState)}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="https://demotiles.maplibre.org/style.json"
+        mapStyle="https://tiles.stadiamaps.com/styles/osm_bright.json"
         onLoad={handleMapLoad}
       />
     </div>

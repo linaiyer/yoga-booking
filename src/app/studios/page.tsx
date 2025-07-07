@@ -13,7 +13,7 @@ export default function StudiosPage() {
   const [selectedStudioUrl, setSelectedStudioUrl] = useState<string | null>(null);
   const [filters, setFilters] = useState<any>({});
   const [tags, setTags] = useState<string[]>([]);
-  const [searchLocation, setSearchLocation] = useState<string>('Manhattan, NY');
+  const [searchLocation, setSearchLocation] = useState<string>('');
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [proximity, setProximity] = useState(10);
   const cardRefs = useRef<{ [url: string]: HTMLDivElement | null }>({});
@@ -22,7 +22,6 @@ export default function StudiosPage() {
     async function fetchStudios() {
       setLoading(true);
       try {
-        // For now, just fetch all studios for Manhattan, NY
         const res = await fetch('http://localhost:8000/studios');
         const data = await res.json();
         setStudios(data);
@@ -40,7 +39,7 @@ export default function StudiosPage() {
     }
   }, [selectedStudioUrl]);
 
-  // Client-side filtering logic
+  // Show all studios by default if no search/filter is applied
   const filteredStudios = studios.filter((studio) => {
     // Rating
     if (filters.rating && studio.rating < parseFloat(filters.rating)) return false;
@@ -67,19 +66,31 @@ export default function StudiosPage() {
     // In a real app, you would refetch from the backend here
   };
 
+  // Set background_main.png as the background for this page
+  useEffect(() => {
+    const prev = document.body.style.backgroundImage;
+    document.body.style.backgroundImage = "url('/assets/background_main.png')";
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+    return () => { document.body.style.backgroundImage = prev; };
+  }, []);
+
   return (
     <>
       <Navbar />
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 0 24px 0' }}>
+        <StudioSearchBar onSearch={handleSearch} />
+        <StudioFilters onFilterChange={setFilters} />
+        <StudioTags onTagsChange={setTags} />
+      </div>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 1rem' }}>
+        <div style={{ color: '#4a5a40', fontSize: '1.2rem', fontWeight: 600, margin: '16px 0 8px 0', letterSpacing: '-0.5px' }}>
+          {loading ? 'Loading studios...' : `Showing ${filteredStudios.length} studios near you`}
+        </div>
         <div style={{ display: 'flex', gap: '2rem', minHeight: 700, flexWrap: 'nowrap' }}>
-          {/* Left side: search, filters, cards */}
+          {/* Left side: cards */}
           <div style={{ flex: 2.2, minWidth: 0 }}>
-            <StudioSearchBar onSearch={handleSearch} />
-            <StudioFilters onFilterChange={setFilters} />
-            <StudioTags onTagsChange={setTags} />
-            <div style={{ color: '#4a5a40', fontSize: '1.1rem', margin: '1.5rem 0 1rem 0', fontWeight: 500 }}>
-              {loading ? 'Loading studios...' : `Showing ${filteredStudios.length} studios near you`}
-            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
               {filteredStudios.map((studio) => (
                 <div

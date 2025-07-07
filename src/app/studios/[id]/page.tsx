@@ -17,6 +17,7 @@ export default function StudioDetailPage() {
   const [studio, setStudio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
     if (!studioId) return;
@@ -32,7 +33,24 @@ export default function StudioDetailPage() {
         setError('Failed to fetch studio details.');
         setLoading(false);
       });
+    // Fetch reviews
+    fetch(`http://localhost:8000/studio/${studioId}/reviews`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.reviews) setReviews(data.reviews);
+      });
   }, [studioId]);
+
+  useEffect(() => {
+    // Save previous background style
+    const prevBg = document.body.style.background;
+    // Set background with !important
+    document.body.style.setProperty('background', "url('/assets/background_main.png') center/cover no-repeat", 'important');
+    return () => {
+      // Restore previous background
+      document.body.style.setProperty('background', prevBg, 'important');
+    };
+  }, []);
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +148,24 @@ export default function StudioDetailPage() {
               {studio.review_count > 0 && (
                 <div style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>Reviews</h3>
-                  <div style={{ color: '#6b705c', fontSize: '1.05rem' }}>See more reviews on <a href={studio.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Yelp</a>.</div>
+                  {reviews.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                      {reviews.map((r, i) => (
+                        <div key={i} style={{ background: '#f1f5f2', borderRadius: '1rem', padding: '1rem 1.2rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: 6 }}>
+                            {r.user && r.user.image_url && <img src={r.user.image_url} alt={r.user.name} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', border: '2px solid #dde5b6' }} />}
+                            <div>
+                              <div style={{ fontWeight: 600 }}>{r.user?.name || 'User'}</div>
+                              <div style={{ color: '#b7b7a4', fontSize: '1.05rem' }}>⭐ {r.rating}</div>
+                            </div>
+                          </div>
+                          <div style={{ color: '#4a5a40', fontSize: '1.08rem' }}>{r.text}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ color: '#6b705c', fontSize: '1.05rem' }}>See more reviews on <a href={studio.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Yelp</a>.</div>
+                  )}
                 </div>
               )}
               {/* House Rules/Policies (placeholder) */}

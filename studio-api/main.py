@@ -30,4 +30,15 @@ def get_studio_details(id: str):
         resp.raise_for_status()
         return resp.json()
     except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/studio/{id}/reviews")
+def get_studio_reviews(id: str):
+    headers = {"Authorization": f"Bearer {YELP_API_KEY}"}
+    url = f"https://api.yelp.com/v3/businesses/{id}/reviews"
+    try:
+        resp = requests.get(url, headers=headers)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
         return {"error": str(e)} 

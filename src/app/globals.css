@@ -27,6 +27,12 @@ body {
   min-height: 100vh;
 }
 
+body.studio-detail-bg {
+  background: url('/assets/background_main.png') center/cover no-repeat !important;
+  color: red !important;
+  font-size: 2rem !important;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: inherit;
   color: #4a5a40;

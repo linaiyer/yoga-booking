@@ -1,0 +1,38 @@
+.filtersBar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.select {
+  border: 1px solid #b7b7a4;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: #4a5a40;
+  background: #f8f5f2;
+}
+.levels {
+  display: flex;
+  gap: 0.5rem;
+}
+.levelBtn {
+  background: #dde5b6;
+  color: #4a5a40;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.levelBtn:hover {
+  background: #b7b7a4;
+}
+.levelSelected {
+  background: #b7b7a4;
+  color: #fff;
+  border: 2px solid #4a5a40;
+} 

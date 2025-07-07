@@ -1,37 +1,30 @@
+"use client";
 import Navbar from '../components/Navbar/Navbar';
 import StudioSearchBar from '../components/StudioSearchBar/StudioSearchBar';
 import StudioFilterBar from '../components/StudioFilterBar/StudioFilterBar';
 import StudioCard from '../components/StudioCard/StudioCard';
 import MapSection from '../components/MapSection/MapSection';
-
-const mockStudios = [
-  {
-    image: '/assets/yoga1.jpg',
-    name: 'Sunrise Yoga Center',
-    price: '$25/class',
-    location: 'Los Angeles, CA',
-    rating: 4.9,
-    features: ['Hot Yoga', 'Beginner Friendly', 'Meditation'],
-  },
-  {
-    image: '/assets/yoga2.jpg',
-    name: 'Peaceful Lotus Studio',
-    price: '$30/class',
-    location: 'Santa Monica, CA',
-    rating: 4.8,
-    features: ['Outdoor', 'Heated', 'Family'],
-  },
-  {
-    image: '/assets/yoga3.jpg',
-    name: 'Urban Zen Loft',
-    price: '$20/class',
-    location: 'Burbank, CA',
-    rating: 4.7,
-    features: ['Private', 'Prenatal', 'Meditation'],
-  },
-];
+import { useEffect, useState } from 'react';
 
 export default function StudiosPage() {
+  const [studios, setStudios] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStudios() {
+      setLoading(true);
+      try {
+        const res = await fetch('http://localhost:8000/studios');
+        const data = await res.json();
+        setStudios(data);
+      } catch (e) {
+        setStudios([]);
+      }
+      setLoading(false);
+    }
+    fetchStudios();
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -42,17 +35,23 @@ export default function StudiosPage() {
             <StudioSearchBar />
             <StudioFilterBar />
             <div style={{ color: '#4a5a40', fontSize: '1.1rem', margin: '1.5rem 0 1rem 0', fontWeight: 500 }}>
-              Showing {mockStudios.length} studios near you
+              {loading ? 'Loading studios...' : `Showing ${studios.length} studios near you`}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-              {mockStudios.map((studio) => (
-                <StudioCard key={studio.name} {...studio} />
+              {studios.map((studio) => (
+                <StudioCard
+                  key={studio.url}
+                  name={studio.name}
+                  location={studio.address}
+                  rating={studio.rating}
+                  link={studio.url}
+                />
               ))}
             </div>
           </div>
           {/* Right side: map */}
           <div style={{ flex: 1, minWidth: 300, maxWidth: 400, height: 650, alignSelf: 'flex-start', position: 'sticky', top: 32 }}>
-            <MapSection />
+            <MapSection studios={studios} />
           </div>
         </div>
       </div>

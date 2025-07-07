@@ -1,44 +1,30 @@
 "use client";
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import Map from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import styles from './MapSection.module.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-const studios = [
-  {
-    name: 'Sunrise Yoga Center',
-    latitude: 34.0522,
-    longitude: -118.2437,
-  },
-  {
-    name: 'Peaceful Lotus Studio',
-    latitude: 34.0195,
-    longitude: -118.4912,
-  },
-  {
-    name: 'Urban Zen Loft',
-    latitude: 34.1808,
-    longitude: -118.3089,
-  },
-];
+type Studio = {
+  name: string;
+  latitude?: number;
+  longitude?: number;
+};
 
-export default function MapSection() {
-  const [viewState, setViewState] = useState({
-    longitude: -118.35,
-    latitude: 34.05,
-    zoom: 10.2,
-  });
+type MapSectionProps = {
+  studios: Studio[];
+};
+
+export default function MapSection({ studios }: MapSectionProps) {
   const mapRef = useRef<any>(null);
 
-  function handleMapLoad(e: any) {
-    mapRef.current = e.target;
+  useEffect(() => {
     if (!mapRef.current) return;
     // Remove existing markers if any
     if ((mapRef.current as any)._studioMarkers) {
       (mapRef.current as any)._studioMarkers.forEach((m: any) => m.remove());
     }
-    (mapRef.current as any)._studioMarkers = studios.map((studio) => {
+    (mapRef.current as any)._studioMarkers = (studios || []).filter(s => s.latitude && s.longitude).map((studio) => {
       const el = document.createElement('div');
       el.style.background = '#b7b7a4';
       el.style.borderRadius = '50%';
@@ -53,24 +39,18 @@ export default function MapSection() {
       el.style.border = '2px solid #4a5a40';
       el.innerText = '🧘';
       return new maplibregl.Marker(el)
-        .setLngLat([studio.longitude, studio.latitude])
+        .setLngLat([studio.longitude!, studio.latitude!])
         .addTo(mapRef.current);
     });
-    // Add zoom controls
-    if (!mapRef.current._navControl) {
-      mapRef.current._navControl = new maplibregl.NavigationControl();
-      mapRef.current.addControl(mapRef.current._navControl, 'top-right');
-    }
-  }
+  }, [studios]);
 
   return (
     <div className={styles.mapContainer}>
       <Map
-        initialViewState={viewState}
-        onMove={evt => setViewState(evt.viewState)}
+        initialViewState={{ longitude: -118.35, latitude: 34.05, zoom: 10.2 }}
         style={{ width: '100%', height: '100%' }}
         mapStyle="https://tiles.stadiamaps.com/styles/osm_bright.json"
-        onLoad={handleMapLoad}
+        onLoad={e => { mapRef.current = e.target; }}
       />
     </div>
   );

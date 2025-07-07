@@ -71,14 +71,11 @@ export default function StudioSearchBar({ onSearch }: { onSearch: (location: str
         )}
       </div>
       <button
-        type="button"
-        className={styles.geoBtn}
-        onClick={handleGeolocate}
-        title="Use my current location"
+        type="submit"
+        className={styles.searchBtn}
       >
-        {/* No emoji, just a styled button */}
+        Search
       </button>
-      <button className={styles.searchBtn} type="submit">Search</button>
     </form>
   );
 } 

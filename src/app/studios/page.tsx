@@ -6,6 +6,7 @@ import StudioTags from '../components/StudioTags/StudioTags';
 import StudioCard from '../components/StudioCard/StudioCard';
 import MapSection from '../components/MapSection/MapSection';
 import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function StudiosPage() {
   const [studios, setStudios] = useState<any[]>([]);
@@ -17,6 +18,7 @@ export default function StudiosPage() {
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [proximity, setProximity] = useState(10);
   const cardRefs = useRef<{ [url: string]: HTMLDivElement | null }>({});
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchStudios() {
@@ -100,25 +102,29 @@ export default function StudiosPage() {
                 width: '100%',
               }}
             >
-              {filteredStudios.map((studio) => (
-                <div
-                  key={studio.url}
-                  ref={el => { cardRefs.current[studio.url] = el; }}
-                  style={{ height: '100%' }}
-                >
-                  <StudioCard
-                    name={studio.name}
-                    image={studio.image_url}
-                    features={studio.categories}
-                    price={studio.price}
-                    location={studio.address}
-                    rating={studio.rating}
-                    link={studio.url}
-                    isSelected={selectedStudioUrl === studio.url}
-                    onClick={() => setSelectedStudioUrl(studio.url)}
-                  />
-                </div>
-              ))}
+              {filteredStudios.map((studio) => {
+                // Extract Yelp business ID from the URL (e.g., https://www.yelp.com/biz/<id>)
+                const yelpId = studio.url ? studio.url.split('/').pop() : '';
+                return (
+                  <div
+                    key={studio.url}
+                    ref={el => { cardRefs.current[studio.url] = el; }}
+                    style={{ height: '100%' }}
+                  >
+                    <StudioCard
+                      name={studio.name}
+                      image={studio.image_url}
+                      features={studio.categories}
+                      price={studio.price}
+                      location={studio.address}
+                      rating={studio.rating}
+                      link={studio.url}
+                      isSelected={selectedStudioUrl === studio.url}
+                      onClick={() => router.push(`/studios/${yelpId}`)}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
           {/* Right side: map */}

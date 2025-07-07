@@ -91,15 +91,26 @@ export default function StudiosPage() {
         <div style={{ display: 'flex', gap: '2rem', minHeight: 700, flexWrap: 'nowrap' }}>
           {/* Left side: cards */}
           <div style={{ flex: 2.2, minWidth: 0 }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '1rem',
+                alignItems: 'stretch',
+                width: '100%',
+              }}
+            >
               {filteredStudios.map((studio) => (
                 <div
                   key={studio.url}
                   ref={el => { cardRefs.current[studio.url] = el; }}
-                  style={{ width: 320, margin: '0.5rem' }}
+                  style={{ height: '100%' }}
                 >
                   <StudioCard
                     name={studio.name}
+                    image={studio.image_url}
+                    features={studio.categories}
+                    price={studio.price}
                     location={studio.address}
                     rating={studio.rating}
                     link={studio.url}

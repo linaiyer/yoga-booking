@@ -25,5 +25,8 @@ def scrape_yoga_studios_manhattan():
             "rating": biz.get("rating"),
             "phone": biz.get("display_phone"),
             "url": biz.get("url"),
+            "image_url": biz.get("image_url"),
+            "categories": [cat["title"] for cat in biz.get("categories", [])],
+            "price": biz.get("price"),
         })
     return studios 

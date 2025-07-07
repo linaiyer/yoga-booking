@@ -8,11 +8,17 @@ type StudioCardProps = {
   rating?: string | number;
   features?: string[];
   link?: string;
+  isSelected?: boolean;
+  onClick?: () => void;
 };
 
-export default function StudioCard({ image, name, price, location, rating, features, link }: StudioCardProps) {
+export default function StudioCard({ image, name, price, location, rating, features, link, isSelected, onClick }: StudioCardProps) {
   return (
-    <div className={styles.card}>
+    <div
+      className={styles.card + (isSelected ? ' ' + styles.selected : '')}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : undefined }}
+    >
       {image && <img src={image} alt={name} className={styles.image} />}
       <div className={styles.info}>
         <h2 className={styles.name}>{link ? <a href={link} target="_blank" rel="noopener noreferrer">{name}</a> : name}</h2>

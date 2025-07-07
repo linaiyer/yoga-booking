@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 export default function StudiosPage() {
   const [studios, setStudios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStudioUrl, setSelectedStudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStudios() {
@@ -45,13 +46,15 @@ export default function StudiosPage() {
                   location={studio.address}
                   rating={studio.rating}
                   link={studio.url}
+                  isSelected={selectedStudioUrl === studio.url}
+                  onClick={() => setSelectedStudioUrl(studio.url)}
                 />
               ))}
             </div>
           </div>
           {/* Right side: map */}
           <div style={{ flex: 1, minWidth: 300, maxWidth: 400, height: 650, alignSelf: 'flex-start', position: 'sticky', top: 32 }}>
-            <MapSection studios={studios} />
+            <MapSection studios={studios} selectedStudioUrl={selectedStudioUrl} setSelectedStudioUrl={setSelectedStudioUrl} />
           </div>
         </div>
       </div>

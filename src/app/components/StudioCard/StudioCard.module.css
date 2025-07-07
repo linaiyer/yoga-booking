@@ -50,4 +50,8 @@
   border-radius: 0.7rem;
   padding: 0.2rem 0.8rem;
   font-size: 0.95rem;
+}
+.selected {
+  border: 2px solid #4a5a40 !important;
+  box-shadow: 0 0 0 4px #dde5b6;
 } 

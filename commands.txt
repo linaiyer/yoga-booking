@@ -1,0 +1,5 @@
+npm run build
+npm start
+
+on a separate terminal window run server
+uvicorn main:app --reload

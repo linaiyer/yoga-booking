@@ -18,6 +18,7 @@ def scrape_yoga_studios_manhattan():
     studios = []
     for biz in data.get("businesses", []):
         studios.append({
+            "id": biz.get("id"),
             "name": biz.get("name"),
             "address": ", ".join(biz["location"].get("display_address", [])),
             "latitude": biz["coordinates"].get("latitude"),

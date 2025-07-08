@@ -17,7 +17,12 @@ export default function StudioDetailPage() {
   const [studio, setStudio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [reviews, setReviews] = useState<any[]>([]);
+  // Remove reviews state and fetching
+  // const [reviews, setReviews] = useState<any[]>([]);
+  // const [reviewsError, setReviewsError] = useState('');
+
+  // Website info state
+  const [websiteInfo, setWebsiteInfo] = useState<{ website?: string; error?: string } | null>(null);
 
   useEffect(() => {
     if (!studioId) return;
@@ -33,12 +38,23 @@ export default function StudioDetailPage() {
         setError('Failed to fetch studio details.');
         setLoading(false);
       });
-    // Fetch reviews
-    fetch(`http://localhost:8000/studio/${studioId}/reviews`)
+    // Remove reviews fetching
+    // fetch(`http://localhost:8000/studio/${studioId}/reviews`)
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     if (data.error) setReviewsError(data.error);
+    //     else if (data.reviews) setReviews(data.reviews);
+    //     else setReviews([]);
+    //   })
+    //   .catch(e => setReviewsError('Failed to fetch reviews.'));
+  }, [studioId]);
+
+  useEffect(() => {
+    if (!studioId) return;
+    fetch(`http://localhost:8000/studio/${studioId}/website-info`)
       .then(res => res.json())
-      .then(data => {
-        if (data.reviews) setReviews(data.reviews);
-      });
+      .then(data => setWebsiteInfo(data))
+      .catch(() => setWebsiteInfo({ error: 'Failed to fetch website info.' }));
   }, [studioId]);
 
   useEffect(() => {
@@ -108,7 +124,15 @@ export default function StudioDetailPage() {
                 </div>
                 <div style={{ minWidth: 120 }}>
                   <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Website</div>
-                  <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>{studio.website ? <a href={studio.website} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Visit</a> : 'N/A'}</div>
+                  <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>
+                    {websiteInfo && websiteInfo.website ? (
+                      <a href={websiteInfo.website} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Visit</a>
+                    ) : websiteInfo && websiteInfo.error === 'No business website available from Yelp API.' ? (
+                      <span style={{ color: '#a0a0a0' }}>Website not available from Yelp</span>
+                    ) : (
+                      'N/A'
+                    )}
+                  </div>
                 </div>
                 <div style={{ minWidth: 120 }}>
                   <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Yelp</div>
@@ -144,30 +168,7 @@ export default function StudioDetailPage() {
                   </ul>
                 </div>
               )}
-              {/* Reviews */}
-              {studio.review_count > 0 && (
-                <div style={{ marginBottom: '2rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>Reviews</h3>
-                  {reviews.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                      {reviews.map((r, i) => (
-                        <div key={i} style={{ background: '#f1f5f2', borderRadius: '1rem', padding: '1rem 1.2rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: 6 }}>
-                            {r.user && r.user.image_url && <img src={r.user.image_url} alt={r.user.name} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', border: '2px solid #dde5b6' }} />}
-                            <div>
-                              <div style={{ fontWeight: 600 }}>{r.user?.name || 'User'}</div>
-                              <div style={{ color: '#b7b7a4', fontSize: '1.05rem' }}>⭐ {r.rating}</div>
-                            </div>
-                          </div>
-                          <div style={{ color: '#4a5a40', fontSize: '1.08rem' }}>{r.text}</div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{ color: '#6b705c', fontSize: '1.05rem' }}>See more reviews on <a href={studio.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Yelp</a>.</div>
-                  )}
-                </div>
-              )}
+              {/* Remove Reviews section */}
               {/* House Rules/Policies (placeholder) */}
               <div style={{ marginBottom: '2rem' }}>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>House Rules</h3>

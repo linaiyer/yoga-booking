@@ -1,6 +1,7 @@
 import styles from './StudioCard.module.css';
 
 type StudioCardProps = {
+  id?: string;
   image?: string;
   name: string;
   price?: string;

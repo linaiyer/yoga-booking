@@ -103,15 +103,14 @@ export default function StudiosPage() {
               }}
             >
               {filteredStudios.map((studio) => {
-                // Extract Yelp business ID from the URL (e.g., https://www.yelp.com/biz/<id>)
-                const yelpId = studio.url ? studio.url.split('/').pop() : '';
                 return (
                   <div
-                    key={studio.url}
+                    key={studio.id}
                     ref={el => { cardRefs.current[studio.url] = el; }}
                     style={{ height: '100%' }}
                   >
                     <StudioCard
+                      id={studio.id}
                       name={studio.name}
                       image={studio.image_url}
                       features={studio.categories}
@@ -120,7 +119,7 @@ export default function StudiosPage() {
                       rating={studio.rating}
                       link={studio.url}
                       isSelected={selectedStudioUrl === studio.url}
-                      onClick={() => router.push(`/studios/${yelpId}`)}
+                      onClick={() => router.push(`/studios/${studio.id}`)}
                     />
                   </div>
                 );

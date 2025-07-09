@@ -1,7 +1,12 @@
+"use client";
 import Link from 'next/link';
 import styles from './Navbar.module.css';
+import { useState } from 'react';
+import LoginModal from '../LoginModal/LoginModal';
 
 export default function Navbar() {
+  const [showLogin, setShowLogin] = useState(false);
+
   return (
     <nav className={styles.navbar}>
       <Link href="/" className={styles.logo} style={{ display: 'flex', alignItems: 'center' }}>
@@ -20,7 +25,8 @@ export default function Navbar() {
         <li><Link href="/about">About</Link></li>
         {/* <li><Link href="/calendar">Calendar</Link></li> */}
       </ul>
-      <Link href="/login" className={styles.loginBtn}>Log in</Link>
+      <button className={styles.loginBtn} onClick={() => setShowLogin(true)}>Log in</button>
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
     </nav>
   );
 } 

@@ -1,7 +1,10 @@
 "use client";
 import { useParams } from 'next/navigation';
 import Navbar from '../../components/Navbar/Navbar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import Map from 'react-map-gl/maplibre';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 export default function StudioDetailPage() {
   const params = useParams();
@@ -27,6 +30,10 @@ export default function StudioDetailPage() {
     rules: false
   });
 
+  // Map refs
+  const mapRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+
   useEffect(() => {
     if (!studioId) return;
     setLoading(true);
@@ -50,6 +57,43 @@ export default function StudioDetailPage() {
       .then(data => setWebsiteInfo(data))
       .catch(() => setWebsiteInfo({ error: 'Failed to fetch website info.' }));
   }, [studioId]);
+
+  // Add marker to map when studio data is loaded
+  useEffect(() => {
+    if (!mapRef.current || !studio?.coordinates?.latitude || !studio?.coordinates?.longitude) return;
+    
+    // Remove existing marker
+    if (markerRef.current) {
+      markerRef.current.remove();
+    }
+
+    // Create marker element
+    const el = document.createElement('div');
+    el.style.background = '#4a5a40';
+    el.style.borderRadius = '50%';
+    el.style.width = '30px';
+    el.style.height = '30px';
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    el.style.color = '#fff';
+    el.style.fontWeight = '700';
+    el.style.fontSize = '20px';
+    el.style.border = '3px solid #dde5b6';
+    el.innerText = '🧘';
+
+    // Add marker to map
+    markerRef.current = new maplibregl.Marker(el)
+      .setLngLat([studio.coordinates.longitude, studio.coordinates.latitude])
+      .addTo(mapRef.current);
+
+    // Center map on studio
+    mapRef.current.flyTo({
+      center: [studio.coordinates.longitude, studio.coordinates.latitude],
+      zoom: 14,
+      essential: true,
+    });
+  }, [studio]);
 
   useEffect(() => {
     // Save previous background style
@@ -77,6 +121,14 @@ export default function StudioDetailPage() {
 
   // Calculate subtotal (placeholder pricing)
   const subtotal = people * 30; // $30 per person placeholder
+
+  // Handle map click to open Google Maps
+  const handleMapClick = () => {
+    if (studio?.coordinates?.latitude && studio?.coordinates?.longitude) {
+      const url = `https://www.google.com/maps?q=${studio.coordinates.latitude},${studio.coordinates.longitude}`;
+      window.open(url, '_blank');
+    }
+  };
 
   return (
     <>
@@ -280,19 +332,45 @@ export default function StudioDetailPage() {
                     <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>{studio.url ? <a href={studio.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>View</a> : 'N/A'}</div>
                   </div>
                 </div>
-                {/* Mini map placeholder */}
+                {/* Working mini map */}
                 <div style={{ 
                   marginTop: '1rem', 
                   height: '150px', 
-                  background: '#f1f5f2', 
                   borderRadius: '0.8rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#6b705c',
-                  fontSize: '0.9rem'
-                }}>
-                  🗺️ Map preview (click to open Google Maps)
+                  overflow: 'hidden',
+                  position: 'relative',
+                  cursor: 'pointer'
+                }} onClick={handleMapClick}>
+                  <Map
+                    initialViewState={{ 
+                      longitude: studio.coordinates?.longitude || -74.006, 
+                      latitude: studio.coordinates?.latitude || 40.7128, 
+                      zoom: 14 
+                    }}
+                    style={{ width: '100%', height: '100%' }}
+                    mapStyle="https://tiles.stadiamaps.com/styles/osm_bright.json"
+                    onLoad={e => { mapRef.current = e.target; }}
+                    interactive={false}
+                  />
+                  {/* Click overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#4a5a40',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    backdropFilter: 'blur(1px)',
+                    transition: 'all 0.2s'
+                  }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.2)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}>
+                    🗺️ Click to open Google Maps
+                  </div>
                 </div>
               </div>
 

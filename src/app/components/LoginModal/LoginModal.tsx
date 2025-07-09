@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { firebaseApp } from '../../../firebaseConfig';
 import { useRef } from 'react';
 
@@ -181,6 +181,11 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const [pwdFocus, setPwdFocus] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const pwdInputRef = useRef<HTMLInputElement>(null);
+  const [phoneStep, setPhoneStep] = useState<'input' | 'code'>('input');
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
+  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
 
   const auth = getAuth(firebaseApp);
 
@@ -223,12 +228,51 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const handleFacebook = () => alert('Facebook login coming soon! Enable in Firebase Console.');
   const handleApple = () => alert('Apple login coming soon! Enable in Firebase Console.');
 
+  // Phone Auth logic
+  const handleSendCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPhoneLoading(true);
+    setPhoneError('');
+    try {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: () => {},
+        }, auth);
+      }
+      const appVerifier = window.recaptchaVerifier;
+      const confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
+      window.confirmationResult = confirmationResult;
+      setPhoneStep('code');
+    } catch (err: any) {
+      setPhoneError(err.message);
+    }
+    setPhoneLoading(false);
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPhoneLoading(true);
+    setPhoneError('');
+    try {
+      const confirmationResult = window.confirmationResult;
+      const result = await confirmationResult.confirm(code);
+      setUser(result.user);
+      setStep('loggedin');
+    } catch (err: any) {
+      setPhoneError(err.message);
+    }
+    setPhoneLoading(false);
+  };
+
   return (
     <div style={overlayStyle}>
       <div style={modalStyle} role="dialog" aria-modal="true">
         <button style={closeBtnStyle} onClick={onClose} aria-label="Close login modal">
           <img src="/assets/close.png" alt="Close" width={20} height={20} />
         </button>
+        {/* reCAPTCHA container (invisible) */}
+        <div id="recaptcha-container" style={{ display: 'none' }} />
         {step === 'main' && <>
           <h2 style={{ fontWeight: 700, fontSize: '1.6rem', marginBottom: 8, marginTop: 0 }}>Welcome to YogaLink!</h2>
           <div style={{ color: '#444', fontSize: '1.08rem', marginBottom: 24, textAlign: 'center' }}>
@@ -245,6 +289,50 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             <img src="/assets/email.png" alt="Email" style={{ width: 22, height: 22 }} /> Continue with Email
           </button>
         </>}
+        {step === 'phone' && (
+          <>
+            <h2 style={{ fontWeight: 700, fontSize: 28, color: MOSS, textAlign: 'center', margin: '0 0 24px 0' }}>Phone Login</h2>
+            {phoneStep === 'input' && (
+              <form onSubmit={handleSendCode} style={{ width: '100%' }}>
+                <div style={{ position: 'relative', marginBottom: 16 }}>
+                  <img src="/assets/phone.png" alt="Phone" style={{ ...iconStyle, filter: 'grayscale(0.2)' }} />
+                  <input
+                    type="tel"
+                    placeholder="+1 555 555 5555"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    required
+                    style={{ ...inputStyle, paddingLeft: 44 }}
+                  />
+                </div>
+                {phoneError && <div style={{ color: ERROR, fontSize: 13, marginBottom: 8 }}>{phoneError}</div>}
+                <button type="submit" style={phoneLoading ? btnPrimaryDisabled : btnPrimary} disabled={phoneLoading}>
+                  {phoneLoading ? 'Sending...' : 'Send Code'}
+                </button>
+                <button type="button" style={{ ...textLink, textDecoration: 'none', margin: '14px 0 0 0' }} onClick={() => setStep('main')}>← Back</button>
+              </form>
+            )}
+            {phoneStep === 'code' && (
+              <form onSubmit={handleVerifyCode} style={{ width: '100%' }}>
+                <div style={{ position: 'relative', marginBottom: 16 }}>
+                  <input
+                    type="text"
+                    placeholder="Enter verification code"
+                    value={code}
+                    onChange={e => setCode(e.target.value)}
+                    required
+                    style={inputStyle}
+                  />
+                </div>
+                {phoneError && <div style={{ color: ERROR, fontSize: 13, marginBottom: 8 }}>{phoneError}</div>}
+                <button type="submit" style={phoneLoading ? btnPrimaryDisabled : btnPrimary} disabled={phoneLoading}>
+                  {phoneLoading ? 'Verifying...' : 'Verify'}
+                </button>
+                <button type="button" style={{ ...textLink, textDecoration: 'none', margin: '14px 0 0 0' }} onClick={() => { setPhoneStep('input'); setCode(''); }}>← Back</button>
+              </form>
+            )}
+          </>
+        )}
         {step === 'email' && <>
           <h2 style={{ fontWeight: 700, fontSize: 28, color: MOSS, textAlign: 'center', margin: '0 0 24px 0' }}>Email Login</h2>
           <form onSubmit={handleEmail} style={{ width: '100%', marginTop: 0 }} id="login">

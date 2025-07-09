@@ -5,8 +5,8 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <Link href="/" className={styles.logo}>
-        <img src="/assets/YogaLink.png" alt="YogaLink" style={{ height: '40px', marginRight: '12px', verticalAlign: 'middle' }} />
-        YogaLink
+        <img src="/assets/YogaLink.png" alt="YogaLink" style={{ height: '48px', marginRight: '12px', verticalAlign: 'middle' }} />
+        <span style={{ display: 'inline-flex', alignItems: 'center', height: '48px' }}>YogaLink</span>
       </Link>
       <ul className={styles.navLinks}>
         <li><Link href="/studios">Find a Yoga Studio</Link></li>

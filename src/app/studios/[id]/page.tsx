@@ -17,12 +17,15 @@ export default function StudioDetailPage() {
   const [studio, setStudio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  // Remove reviews state and fetching
-  // const [reviews, setReviews] = useState<any[]>([]);
-  // const [reviewsError, setReviewsError] = useState('');
-
+  
   // Website info state
   const [websiteInfo, setWebsiteInfo] = useState<{ website?: string; error?: string } | null>(null);
+
+  // Accordion state
+  const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({
+    hours: false,
+    rules: false
+  });
 
   useEffect(() => {
     if (!studioId) return;
@@ -38,15 +41,6 @@ export default function StudioDetailPage() {
         setError('Failed to fetch studio details.');
         setLoading(false);
       });
-    // Remove reviews fetching
-    // fetch(`http://localhost:8000/studio/${studioId}/reviews`)
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     if (data.error) setReviewsError(data.error);
-    //     else if (data.reviews) setReviews(data.reviews);
-    //     else setReviews([]);
-    //   })
-    //   .catch(e => setReviewsError('Failed to fetch reviews.'));
   }, [studioId]);
 
   useEffect(() => {
@@ -74,6 +68,13 @@ export default function StudioDetailPage() {
     console.log({ studioId, date, time, people });
   };
 
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   return (
     <>
       <Navbar />
@@ -86,70 +87,138 @@ export default function StudioDetailPage() {
           <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
             {/* Left column: Gallery + Details */}
             <div style={{ flex: 2, minWidth: 0, maxWidth: 700 }}>
-              {/* Image gallery */}
-              {studio.photos && studio.photos.length > 0 && (
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', overflowX: 'auto', borderRadius: '1.2rem' }}>
-                  {studio.photos.map((url: string, i: number) => (
-                    <img key={i} src={url} alt={studio.name} style={{ height: 260, borderRadius: '1.2rem', objectFit: 'cover', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }} />
-                  ))}
-                </div>
-              )}
-              {/* Title, rating, tags */}
-              <div style={{ marginBottom: '1.2rem' }}>
-                <h1 style={{ fontSize: '2.3rem', fontWeight: 700, margin: 0 }}>{studio.name}</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', margin: '0.5rem 0 0.2rem 0' }}>
-                  {studio.rating && <span style={{ fontSize: '1.2rem' }}>⭐ {studio.rating} ({studio.review_count} reviews)</span>}
-                  {studio.price && <span style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.2rem 0.8rem', fontWeight: 600 }}>{studio.price}</span>}
-                  {studio.categories && studio.categories.length > 0 && (
-                    <span style={{ display: 'flex', gap: '0.5rem' }}>
-                      {studio.categories.map((cat: any) => (
-                        <span key={cat.alias} style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.2rem 0.8rem', fontWeight: 500 }}>{cat.title}</span>
-                      ))}
-                    </span>
-                  )}
-                </div>
-                {studio.location && studio.location.display_address && (
-                  <div style={{ color: '#6b705c', fontSize: '1.1rem', marginTop: 4 }}>{studio.location.display_address.join(', ')}</div>
-                )}
+              {/* Studio title */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, color: '#4a5a40' }}>{studio.name}</h1>
               </div>
-              {/* Quick facts */}
-              <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                <div style={{ minWidth: 120 }}>
-                  <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Capacity</div>
-                  <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>Up to 30 people</div>
-                </div>
-                <div style={{ minWidth: 120 }}>
-                  <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Phone</div>
-                  <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>{studio.display_phone || 'N/A'}</div>
-                </div>
-                <div style={{ minWidth: 120 }}>
-                  <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Website</div>
-                  <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>
-                    {websiteInfo && websiteInfo.website ? (
-                      <a href={websiteInfo.website} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Visit</a>
-                    ) : websiteInfo && websiteInfo.error === 'No business website available from Yelp API.' ? (
-                      <span style={{ color: '#a0a0a0' }}>Website not available from Yelp</span>
-                    ) : (
-                      'N/A'
+
+              {/* Image gallery with overlay */}
+              {studio.photos && studio.photos.length > 0 && (
+                <div style={{ position: 'relative', marginBottom: '2rem', borderRadius: '1.2rem', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto' }}>
+                    {studio.photos.map((url: string, i: number) => (
+                      <img key={i} src={url} alt={studio.name} style={{ height: 260, borderRadius: '1.2rem', objectFit: 'cover', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }} />
+                    ))}
+                  </div>
+                  {/* Semi-opaque overlay for text */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    bottom: 0, 
+                    left: 0, 
+                    right: 0, 
+                    background: 'rgba(0, 40, 10, 0.55)', 
+                    padding: '2rem 1.5rem 1.5rem',
+                    color: 'white'
+                  }}>
+                    <h1 style={{ fontSize: '2.3rem', fontWeight: 700, margin: 0, color: 'white' }}>{studio.name}</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', margin: '0.5rem 0 0.2rem 0' }}>
+                      {studio.rating && <span style={{ fontSize: '1.2rem', color: '#FFD700' }}>⭐ {studio.rating} ({studio.review_count} reviews)</span>}
+                      {studio.price && <span style={{ background: 'rgba(255,255,255,0.2)', color: 'white', borderRadius: '0.7rem', padding: '0.2rem 0.8rem', fontWeight: 600 }}>From ${studio.price}</span>}
+                    </div>
+                    {studio.location && studio.location.display_address && (
+                      <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem', marginTop: 4 }}>{studio.location.display_address.join(', ')}</div>
                     )}
                   </div>
                 </div>
-                <div style={{ minWidth: 120 }}>
-                  <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Yelp</div>
-                  <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>{studio.url ? <a href={studio.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>View</a> : 'N/A'}</div>
+              )}
+
+              {/* Yoga-specific quick facts */}
+              <div style={{ 
+                background: 'white', 
+                borderRadius: '1.2rem', 
+                padding: '1.5rem', 
+                marginBottom: '1.5rem',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+              }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  ✧ Quick Facts
+                </h3>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <span style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.4rem 0.8rem', fontWeight: 500, fontSize: '0.9rem' }}>
+                    🧘 Vinyasa · Yin · Hot
+                  </span>
+                  <span style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.4rem 0.8rem', fontWeight: 500, fontSize: '0.9rem' }}>
+                    🌡️ 85°F (heated)
+                  </span>
+                  <span style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.4rem 0.8rem', fontWeight: 500, fontSize: '0.9rem' }}>
+                    🧘‍♀️ Mats · Blocks · Bolsters
+                  </span>
+                  <span style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.4rem 0.8rem', fontWeight: 500, fontSize: '0.9rem' }}>
+                    🚿 2 showers, lockers
+                  </span>
+                  <span style={{ background: '#dde5b6', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.4rem 0.8rem', fontWeight: 500, fontSize: '0.9rem' }}>
+                    🚇 2 min walk from 4/6/E trains
+                  </span>
                 </div>
               </div>
+
+              {/* Contact info card */}
+              <div style={{ 
+                background: 'white', 
+                borderRadius: '1.2rem', 
+                padding: '1.5rem', 
+                marginBottom: '1.5rem',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+              }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  📞 Contact Info
+                </h3>
+                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                  <div style={{ minWidth: 120 }}>
+                    <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Capacity</div>
+                    <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>Up to 30 people</div>
+                  </div>
+                  <div style={{ minWidth: 120 }}>
+                    <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Phone</div>
+                    <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>{studio.display_phone || 'N/A'}</div>
+                  </div>
+                  <div style={{ minWidth: 120 }}>
+                    <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Website</div>
+                    <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>
+                      {websiteInfo && websiteInfo.website ? (
+                        <a href={websiteInfo.website} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>Visit</a>
+                      ) : websiteInfo && websiteInfo.error === 'No business website available from Yelp API.' ? (
+                        <span style={{ color: '#a0a0a0' }}>Website not available from Yelp</span>
+                      ) : (
+                        'N/A'
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ minWidth: 120 }}>
+                    <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: 2 }}>Yelp</div>
+                    <div style={{ color: '#4a5a40', fontSize: '1.1rem' }}>{studio.url ? <a href={studio.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a5a40', textDecoration: 'underline' }}>View</a> : 'N/A'}</div>
+                  </div>
+                </div>
+              </div>
+
               {/* About/Description */}
               {studio.description && (
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>About</h3>
-                  <div style={{ fontSize: '1.08rem', color: '#4a5a40' }}>{studio.description}</div>
+                <div style={{ 
+                  background: 'white', 
+                  borderRadius: '1.2rem', 
+                  padding: '1.5rem', 
+                  marginBottom: '1.5rem',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+                }}>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    ✧ About the Studio
+                  </h3>
+                  <div style={{ fontSize: '1.08rem', color: '#4a5a40', lineHeight: 1.6 }}>{studio.description}</div>
                 </div>
               )}
+
               {/* Amenities/features */}
               {studio.attributes && (
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>Amenities</h3>
+                <div style={{ 
+                  background: 'white', 
+                  borderRadius: '1.2rem', 
+                  padding: '1.5rem', 
+                  marginBottom: '1.5rem',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+                }}>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    ✧ Amenities
+                  </h3>
                   <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '0.7rem', padding: 0, listStyle: 'none' }}>
                     {Object.entries(studio.attributes).map(([key, value]) => (
                       <li key={key} style={{ background: '#f1f5f2', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.2rem 0.8rem', fontSize: '0.98rem' }}>{key.replace(/_/g, ' ')}: {String(value)}</li>
@@ -157,61 +226,193 @@ export default function StudioDetailPage() {
                   </ul>
                 </div>
               )}
-              {/* Hours */}
+
+              {/* Hours - Accordion */}
               {studio.hours && studio.hours.length > 0 && studio.hours[0].open && (
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>Hours</h3>
-                  <ul style={{ padding: 0, listStyle: 'none', color: '#4a5a40', fontSize: '0.98rem' }}>
-                    {studio.hours[0].open.map((h: any, i: number) => (
-                      <li key={i}>{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][h.day]}: {h.start.slice(0,2)}:{h.start.slice(2)} - {h.end.slice(0,2)}:{h.end.slice(2)}</li>
-                    ))}
-                  </ul>
+                <div style={{ 
+                  background: 'white', 
+                  borderRadius: '1.2rem', 
+                  padding: '1.5rem', 
+                  marginBottom: '1.5rem',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+                }}>
+                  <button 
+                    onClick={() => toggleSection('hours')}
+                    style={{ 
+                      width: '100%', 
+                      textAlign: 'left', 
+                      background: 'none', 
+                      border: 'none', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      🕐 Hours
+                    </h3>
+                    <span style={{ 
+                      transform: expandedSections.hours ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s',
+                      fontSize: '1.2rem'
+                    }}>▼</span>
+                  </button>
+                  {expandedSections.hours && (
+                    <ul style={{ padding: 0, listStyle: 'none', color: '#4a5a40', fontSize: '0.98rem', marginTop: '1rem' }}>
+                      {studio.hours[0].open.map((h: any, i: number) => (
+                        <li key={i}>{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][h.day]}: {h.start.slice(0,2)}:{h.start.slice(2)} - {h.end.slice(0,2)}:{h.end.slice(2)}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
-              {/* Remove Reviews section */}
-              {/* House Rules/Policies (placeholder) */}
-              <div style={{ marginBottom: '2rem' }}>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: 6 }}>House Rules</h3>
-                <ul style={{ color: '#4a5a40', fontSize: '1.05rem', paddingLeft: 18 }}>
-                  <li>No smoking inside the studio</li>
-                  <li>Arrive 10 minutes before class</li>
-                  <li>Respect other guests and staff</li>
-                  <li>Cancellation: 24 hours notice for full refund</li>
-                </ul>
+
+              {/* House Rules - Accordion */}
+              <div style={{ 
+                background: 'white', 
+                borderRadius: '1.2rem', 
+                padding: '1.5rem', 
+                marginBottom: '2rem',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+              }}>
+                <button 
+                  onClick={() => toggleSection('rules')}
+                  style={{ 
+                    width: '100%', 
+                    textAlign: 'left', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    ✋ House Rules
+                  </h3>
+                  <span style={{ 
+                    transform: expandedSections.rules ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s',
+                    fontSize: '1.2rem'
+                  }}>▼</span>
+                </button>
+                {expandedSections.rules && (
+                  <ul style={{ color: '#4a5a40', fontSize: '1.05rem', paddingLeft: 18, marginTop: '1rem', lineHeight: 1.6 }}>
+                    <li>No smoking inside the studio</li>
+                    <li>Arrive 10 minutes before class</li>
+                    <li>Respect other guests and staff</li>
+                    <li>Cancellation: 24 hours notice for full refund</li>
+                  </ul>
+                )}
               </div>
             </div>
+
             {/* Right column: Booking widget, sticky on desktop */}
-            <div style={{ flex: 1, minWidth: 320, maxWidth: 400, position: 'sticky', top: 32, alignSelf: 'flex-start' }}>
-              <form onSubmit={handleBooking} style={{ background: '#dde5b6', borderRadius: '1.2rem', padding: '2rem', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', marginBottom: '2rem' }}>
+            <div style={{ flex: 1, minWidth: 320, maxWidth: 400, position: 'sticky', top: 96, alignSelf: 'flex-start' }}>
+              <form onSubmit={handleBooking} style={{ 
+                background: '#dde5b6', 
+                borderRadius: '1.2rem', 
+                padding: '2rem', 
+                boxShadow: '0 4px 16px rgba(0,0,0,0.12)', 
+                marginBottom: '2rem',
+                border: '2px solid #8FA88F'
+              }}>
                 <h2 style={{ fontSize: '1.3rem', fontWeight: 600, marginBottom: '1.2rem', color: '#4a5a40' }}>Book this Studio</h2>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', marginBottom: 6 }}>Date</label>
-                  <input type="date" value={date} onChange={e => setDate(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b7b7a4', fontSize: '1rem' }} />
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Date</label>
+                  <input 
+                    type="date" 
+                    value={date} 
+                    onChange={e => setDate(e.target.value)} 
+                    required 
+                    style={{ 
+                      width: '100%', 
+                      padding: 12, 
+                      borderRadius: 8, 
+                      border: '2px solid #8FA88F', 
+                      fontSize: '1rem',
+                      background: 'white',
+                      boxSizing: 'border-box'
+                    }} 
+                  />
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', marginBottom: 6 }}>Time</label>
-                  <input type="time" value={time} onChange={e => setTime(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b7b7a4', fontSize: '1rem' }} />
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Time</label>
+                  <input 
+                    type="time" 
+                    value={time} 
+                    onChange={e => setTime(e.target.value)} 
+                    required 
+                    style={{ 
+                      width: '100%', 
+                      padding: 12, 
+                      borderRadius: 8, 
+                      border: '2px solid #8FA88F', 
+                      fontSize: '1rem',
+                      background: 'white',
+                      boxSizing: 'border-box'
+                    }} 
+                  />
                 </div>
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: 6 }}>Number of People</label>
-                  <input type="number" min={1} max={30} value={people} onChange={e => setPeople(Number(e.target.value))} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #b7b7a4', fontSize: '1rem' }} />
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Number of People</label>
+                  <input 
+                    type="number" 
+                    min={1} 
+                    max={30} 
+                    value={people} 
+                    onChange={e => setPeople(Number(e.target.value))} 
+                    required 
+                    style={{ 
+                      width: '100%', 
+                      padding: 12, 
+                      borderRadius: 8, 
+                      border: '2px solid #8FA88F', 
+                      fontSize: '1rem',
+                      background: 'white',
+                      boxSizing: 'border-box'
+                    }} 
+                  />
                 </div>
-                <button type="submit" style={{ background: '#4a5a40', color: '#fff', fontWeight: 600, fontSize: '1.1rem', border: 'none', borderRadius: 8, padding: '0.8rem 2.2rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
-                  Book
+                <button 
+                  type="submit" 
+                  style={{ 
+                    background: '#2F4F2E', 
+                    color: '#fff', 
+                    fontWeight: 600, 
+                    fontSize: '1.1rem', 
+                    border: 'none', 
+                    borderRadius: 8, 
+                    padding: '1rem 2.2rem', 
+                    cursor: 'pointer', 
+                    boxShadow: '0 2px 4px rgba(0,0,0,.15)',
+                    width: '100%',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#1a2f1a'}
+                  onMouseOut={(e) => e.currentTarget.style.background = '#2F4F2E'}
+                >
+                  Book Now
                 </button>
+                <div style={{ 
+                  marginTop: '1rem', 
+                  padding: '0.8rem', 
+                  background: 'rgba(255,255,255,0.6)', 
+                  borderRadius: 6, 
+                  fontSize: '0.9rem',
+                  color: '#4a5a40',
+                  textAlign: 'center'
+                }}>
+                  Free cancellation up to 24h before class
+                </div>
                 {submitted && (
-                  <div style={{ marginTop: '1.2rem', color: '#4a5a40', fontWeight: 500 }}>
+                  <div style={{ marginTop: '1.2rem', color: '#4a5a40', fontWeight: 500, textAlign: 'center' }}>
                     Booking submitted! (Check console for details.)
                   </div>
                 )}
               </form>
-              {/* Host/Owner Info (placeholder) */}
-              <div style={{ background: '#f1f5f2', borderRadius: '1.2rem', padding: '1.2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '2rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: 6 }}>Host Info</h3>
-                <div style={{ color: '#4a5a40', fontSize: '1.05rem' }}>Hosted by <b>{studio.name}</b></div>
-                <div style={{ color: '#6b705c', fontSize: '0.98rem', marginTop: 4 }}>Pro Host</div>
-                <div style={{ color: '#6b705c', fontSize: '0.98rem', marginTop: 2 }}>Response time: Within a day</div>
-              </div>
             </div>
           </div>
         ) : null}

@@ -93,15 +93,15 @@ export default function StudioDetailPage() {
               {/* Studio title with rating and price */}
               <div style={{ marginBottom: '1.5rem' }}>
                 <h1 style={{ 
-                  fontSize: '2.5rem', 
+                  fontSize: '42px', 
                   fontWeight: 700, 
                   margin: 0, 
-                  color: '#4a5a40',
+                  color: '#203020',
                   fontFamily: '"Merriweather Sans", sans-serif'
                 }}>{studio.name}</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                   {studio.rating && (
-                    <span style={{ fontSize: '1.1rem', color: '#FFD700', fontWeight: 600 }}>
+                    <span style={{ fontSize: '1.1rem', color: '#D8B44E', fontWeight: 600 }}>
                       ★ {studio.rating} ({studio.review_count} reviews)
                     </span>
                   )}
@@ -144,7 +144,7 @@ export default function StudioDetailPage() {
                   }}>
                     <h1 style={{ fontSize: '2.3rem', fontWeight: 700, margin: 0, color: '#4a5a40' }}>{studio.name}</h1>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', margin: '0.5rem 0 0.2rem 0' }}>
-                      {studio.rating && <span style={{ fontSize: '1.2rem', color: '#FFD700' }}>⭐ {studio.rating} ({studio.review_count} reviews)</span>}
+                      {studio.rating && <span style={{ fontSize: '1.2rem', color: '#D8B44E' }}>⭐ {studio.rating} ({studio.review_count} reviews)</span>}
                       {studio.price && <span style={{ background: 'rgba(47,79,46,0.2)', color: '#4a5a40', borderRadius: '0.7rem', padding: '0.2rem 0.8rem', fontWeight: 600 }}>From ${studio.price}</span>}
                     </div>
                     {studio.location && studio.location.display_address && (

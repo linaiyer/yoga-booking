@@ -9,10 +9,7 @@
   position: sticky;
   top: 80px;
   z-index: 10;
-  background: transparent; /* fully transparent */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  border-radius: 1.5rem;
-  backdrop-filter: blur(8px);
+  background: transparent;
 }
 .select {
   border: none;

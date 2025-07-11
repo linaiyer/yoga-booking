@@ -5,8 +5,12 @@
   margin-bottom: 1.5rem;
   flex-wrap: nowrap;
   justify-content: center;
-  overflow-x: auto;
   padding-bottom: 2px;
+  position: sticky;
+  top: 80px;
+  z-index: 1;
+  background: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 .select {
   border: none;
@@ -32,21 +36,37 @@
   display: flex;
   gap: 0.5rem;
 }
-.levelBtn {
-  background: #dde5b6;
+.levelBtn, .chip {
+  background: #e7eedf;
   color: #4a5a40;
   border: none;
-  border-radius: 1rem;
+  border-radius: 999px;
   padding: 0.5rem 1.2rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
-.levelBtn:hover {
-  background: #b7b7a4;
+.levelBtn:hover, .chip:hover {
+  background: #c8d7c0;
+  color: #264A2E;
 }
 .levelSelected {
   background: #b7b7a4;
   color: #fff;
   border: 2px solid #4a5a40;
+}
+.moreFiltersPill {
+  background: #dde5b6;
+  color: #4a5a40;
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: background 0.2s;
+}
+.moreFiltersPill:hover {
+  background: #b7b7a4;
 } 

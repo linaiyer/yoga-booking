@@ -29,6 +29,7 @@ export default function StudioFilters({ onFilterChange }: { onFilterChange: (fil
         <option value="">Price</option>
         {priceRanges.map(p => <option key={p} value={p}>{p}</option>)}
       </select>
+      <button className={styles.moreFiltersPill} type="button">More filters</button>
     </div>
   );
 } 

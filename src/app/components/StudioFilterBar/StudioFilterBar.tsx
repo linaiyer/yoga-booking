@@ -1,4 +1,5 @@
 import styles from './StudioFilterBar.module.css';
+import { useState } from 'react';
 
 const filters = [
   'Hot Yoga',
@@ -12,9 +13,18 @@ const filters = [
 ];
 
 export default function StudioFilterBar() {
+  const [showFilters, setShowFilters] = useState(false);
+
   return (
     <div className={styles.filterBar}>
-      {filters.map((filter) => (
+      <button
+        className={styles.moreFiltersBtn}
+        onClick={() => setShowFilters((v) => !v)}
+        type="button"
+      >
+        {showFilters ? 'Less filters' : 'More filters'}
+      </button>
+      {showFilters && filters.map((filter) => (
         <button key={filter} className={styles.filterBtn}>{filter}</button>
       ))}
     </div>

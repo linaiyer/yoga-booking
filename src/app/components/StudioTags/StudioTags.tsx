@@ -7,6 +7,7 @@ const tags = [
 
 export default function StudioTags({ onTagsChange }: { onTagsChange: (tags: string[]) => void }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const [showTags, setShowTags] = useState(false);
 
   const handleToggle = (tag: string) => {
     setSelected(prev => {
@@ -18,7 +19,14 @@ export default function StudioTags({ onTagsChange }: { onTagsChange: (tags: stri
 
   return (
     <div className={styles.tagsBar}>
-      {tags.map(tag => (
+      <button
+        className={styles.moreFiltersBtn}
+        type="button"
+        onClick={() => setShowTags(v => !v)}
+      >
+        {showTags ? 'Less filters' : 'More filters'}
+      </button>
+      {showTags && tags.map(tag => (
         <button
           key={tag}
           className={selected.includes(tag) ? styles.tagSelected : styles.tagBtn}

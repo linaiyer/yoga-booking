@@ -79,7 +79,7 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   max-width: 900px;
   margin: 0 auto 12px auto;
-  padding: 12px 24px;
+  padding: 12px 24px 12px 24px; /* pl-4 pr-2 equivalent */
 }
 .locWrap {
   position: relative;
@@ -113,11 +113,11 @@
   z-index: auto;
 }
 .proxPill {
-  background: #dde5b6;
+  background: #e7eedf;
   color: #4a5a40;
   border: none;
   border-radius: 999px;
-  padding: 0.5rem 1.2rem;
+  padding: 0.5rem 2.2rem 0.5rem 1.2rem; /* extra right padding for chevron */
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -129,6 +129,7 @@
   appearance: none;
   -webkit-appearance: none;
   position: relative;
+  user-select: none;
 }
 .proxPill:hover {
   background: #b7b7a4;
@@ -141,6 +142,11 @@
   right: 1.2rem;
   top: 50%;
   transform: translateY(-50%);
+  width: 1em;
+  height: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sliderWrapper {
   position: relative;

@@ -79,6 +79,11 @@ export default function StudioSearchBar({ onSearch, initialLocation = '' }: { on
             ref={pillButtonRef}
           >
             Within {proximity} mi
+            <span className={styles.pillArrow} aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 8L10 12L14 8" stroke="#4a5a40" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
           </button>
         </div>
         {showSlider && typeof window !== 'undefined' && popoverPosition && createPortal(

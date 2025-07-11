@@ -2,4 +2,7 @@ npm run build
 npm start
 
 on a separate terminal window run server
+cd studio-api
+source venv/bin/activate
+pip install uvicorn
 uvicorn main:app --reload

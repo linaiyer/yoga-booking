@@ -4,29 +4,35 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  /* Gradient overlay via pseudo-element */
 }
 .overlay {
-  background: rgba(255, 255, 240, 0.7);
+  background: rgba(255, 255, 240, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 3rem 2rem;
   border-radius: 1.5rem;
   box-shadow: 0 4px 32px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 .title {
   position: absolute;
   top: 6vh;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2.2rem;
+  font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
   margin: 0;
   padding: 0 2rem;
   text-align: center;
   color: #4a5a40;
   font-weight: 700;
+  line-height: 1.2;
   z-index: 2;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.18), 0 1px 2px rgba(255,255,255,0.2);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 .searchBox {
   display: flex;
@@ -39,32 +45,79 @@
   max-width: 400px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
+.ctaForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  align-items: center;
+}
+@media (max-width: 639px) {
+  .ctaForm {
+    grid-template-columns: 1fr;
+  }
+}
 .icon {
+  grid-row: 1;
+  grid-column: 1;
   width: 1.5rem;
   height: 1.5rem;
-  background: url('/public/file.svg') center/contain no-repeat;
+  background: url('/assets/pin.png') center/contain no-repeat;
   margin-right: 0.75rem;
   opacity: 0.7;
+  position: absolute;
+  left: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 .input {
   border: none;
-  background: transparent;
+  background: #fff;
   font-size: 1.1rem;
   outline: none;
-  flex: 1;
   color: #4a5a40;
+  width: 100%;
+  max-width: 420px;
+  padding: 0.85rem 1.25rem 0.85rem 3.25rem;
+  border-radius: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+}
+.input:focus {
+  box-shadow: 0 0 0 3px rgba(74,90,64,0.25);
 }
 .cta {
-  background: #b7b7a4;
+  background: #4a5a40;
   color: #fff;
   border: none;
-  border-radius: 0.75rem;
-  padding: 1rem 2.5rem;
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin-top: 0.5rem;
-  transition: background 0.2s;
+  border-radius: 2rem;
+  padding: 0.85rem 2.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: 0;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .cta:hover {
-  background: #a3b18a;
+  background: #3a4a30;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+.cta:active {
+  background: #3a4a30;
+  transform: scale(0.98);
+}
+
+/* Accent color utility for buttons/links/stars */
+.accent {
+  color: #e0b85d !important;
+  fill: #e0b85d !important;
 } 

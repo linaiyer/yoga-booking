@@ -4,17 +4,19 @@
   justify-content: space-between;
   padding: 1.5rem 3rem;
   background: transparent !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
   border: none;
 }
 .logo {
   font-size: 2rem;
   font-weight: bold;
   color: #4a5a40;
+  display: flex;
+  align-items: center;
+  gap: 18px; /* increased spacing between logo and word-mark */
 }
 .navLinks {
   display: flex;
-  gap: 2rem;
+  gap: 2.5rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -23,21 +25,31 @@
   text-decoration: none;
   color: #4a5a40;
   font-size: 1.2rem;
-  transition: color 0.2s;
+  transition: color 0.2s, box-shadow 0.2s;
+  padding: 0.25rem 1.25rem;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+  position: relative;
 }
-.navLinks li a:hover {
-  color: #a3b18a;
+.navLinks li a:hover, .navLinks li a:focus {
+  color: #4a5a40;
+  box-shadow: 0 2px 0 0 #a3b18a;
+  background: rgba(163, 177, 138, 0.08);
 }
 .loginBtn {
-  background: #dde5b6;
-  color: #4a5a40;
+  background: #4a5a40;
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1.2rem;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1.5rem;
   font-size: 1rem;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
-.loginBtn:hover {
-  background: #b7b7a4;
+.loginBtn:hover, .loginBtn:focus {
+  background: #3a4a30;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(74,90,64,0.12);
 } 

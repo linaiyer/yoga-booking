@@ -4,8 +4,12 @@ import HomeHero from './components/HomeHero/HomeHero';
 export default function Home() {
   return (
     <>
-      <Navbar />
-      <HomeHero />
+      <header>
+        <Navbar />
+      </header>
+      <main>
+        <HomeHero />
+      </main>
     </>
   );
 }

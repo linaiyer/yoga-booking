@@ -10,7 +10,7 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <Link href="/" className={styles.logo} style={{ display: 'flex', alignItems: 'center' }}>
-        <img src="/assets/YogaLink.png" alt="YogaLink" style={{ height: '40px', marginRight: '12px' }} />
+        <img src="/assets/YogaLink.png" alt="YogaLink" style={{ height: '40px' }} />
         <span style={{ 
           fontSize: '24px',
           fontWeight: 600,
@@ -22,7 +22,7 @@ export default function Navbar() {
       </Link>
       <ul className={styles.navLinks}>
         <li><Link href="/studios">Find a Yoga Studio</Link></li>
-        <li><Link href="/about">About</Link></li>
+        {/* <li><Link href="/about">About</Link></li> */}
         {/* <li><Link href="/calendar">Calendar</Link></li> */}
       </ul>
       <button className={styles.loginBtn} onClick={() => setShowLogin(true)}>Log in</button>

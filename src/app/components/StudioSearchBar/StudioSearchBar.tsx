@@ -1,8 +1,8 @@
 import styles from './StudioSearchBar.module.css';
 import { useState, useRef, useEffect } from 'react';
 
-export default function StudioSearchBar({ onSearch }: { onSearch: (location: string, proximity: number, useCurrentLocation: boolean) => void }) {
-  const [location, setLocation] = useState('');
+export default function StudioSearchBar({ onSearch, initialLocation = '' }: { onSearch: (location: string, proximity: number, useCurrentLocation: boolean) => void, initialLocation?: string }) {
+  const [location, setLocation] = useState(initialLocation);
   const [proximity, setProximity] = useState(10); // default 10 miles
   const [showSlider, setShowSlider] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);

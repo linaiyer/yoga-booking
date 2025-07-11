@@ -3,9 +3,12 @@ import Link from 'next/link';
 import styles from './Navbar.module.css';
 import { useState } from 'react';
 import LoginModal from '../LoginModal/LoginModal';
+import AccountSettingsModal from '../AccountSettingsModal/AccountSettingsModal';
 
 export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   return (
     <nav className={styles.navbar}>
@@ -25,8 +28,15 @@ export default function Navbar() {
         {/* <li><Link href="/about">About</Link></li> */}
         {/* <li><Link href="/calendar">Calendar</Link></li> */}
       </ul>
-      <button className={styles.loginBtn} onClick={() => setShowLogin(true)}>Log in</button>
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+      {user ? (
+        <button className={styles.loginBtn} onClick={() => setShowAccount(true)}>
+          {user.displayName || user.email || user.phoneNumber || 'User'}
+        </button>
+      ) : (
+        <button className={styles.loginBtn} onClick={() => setShowLogin(true)}>Log in</button>
+      )}
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} setUser={setUser} />}
+      {showAccount && <AccountSettingsModal user={user} onClose={() => setShowAccount(false)} setUser={setUser} />}
     </nav>
   );
 } 

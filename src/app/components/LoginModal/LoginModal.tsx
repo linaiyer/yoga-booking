@@ -12,6 +12,7 @@ const ERROR = '#C64840';
 
 interface LoginModalProps {
   onClose: () => void;
+  setUser: (user: any) => void;
 }
 
 const overlayStyle: React.CSSProperties = {
@@ -169,11 +170,11 @@ const errorStyle: React.CSSProperties = {
   minHeight: 18,
 };
 
-export default function LoginModal({ onClose }: LoginModalProps) {
+export default function LoginModal({ onClose, setUser }: LoginModalProps) {
   const [step, setStep] = useState<'main' | 'email' | 'loggedin'>('main');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState<any>(null);
+  const [localUser, setLocalUser] = useState<any>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -190,6 +191,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      setLocalUser(result.user);
       setUser(result.user);
       setStep('loggedin');
     } catch (e: any) {
@@ -204,6 +206,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
     setError('');
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
+      setLocalUser(result.user);
       setUser(result.user);
       setStep('loggedin');
     } catch (e: any) {
@@ -214,7 +217,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
 
   const handleLogout = async () => {
     await signOut(auth);
-    setUser(null);
+    setLocalUser(null);
     setStep('main');
   };
 
@@ -295,8 +298,8 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             <button type="button" style={{ ...textLink, textDecoration: 'none', margin: '14px 0 0 0' }} onClick={() => setStep('main')}>← Back</button>
           </form>
         </>}
-        {step === 'loggedin' && user && <>
-          <h2 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: 8, marginTop: 0 }}>Welcome, {user.displayName || user.email || user.phoneNumber}!</h2>
+        {step === 'loggedin' && localUser && <>
+          <h2 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: 8, marginTop: 0 }}>Welcome, {localUser.displayName || localUser.email || localUser.phoneNumber}!</h2>
           <div style={{ color: '#444', fontSize: '1.08rem', marginBottom: 24, textAlign: 'center' }}>
             You are now logged in.
           </div>

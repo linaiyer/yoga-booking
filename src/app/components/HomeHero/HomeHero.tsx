@@ -1,9 +1,11 @@
 "use client";
 import styles from './HomeHero.module.css';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function HomeHero() {
   const [inputValue, setInputValue] = useState('');
+  const router = useRouter();
   const suggestions = [
     'Ann Arbor · MI',
     'New York · NY',
@@ -70,7 +72,10 @@ export default function HomeHero() {
     <section className={styles.hero}>
       <h1 className={styles.title}>All your favorite Yoga Studios in one place</h1>
       <div className={styles.overlay}>
-        <form className={styles.ctaForm} autoComplete="off">
+        <form className={styles.ctaForm} autoComplete="off" onSubmit={e => {
+          e.preventDefault();
+          router.push(`/studios?q=${encodeURIComponent(inputValue)}`);
+        }}>
           <div className={styles.inputWrapper}>
             <span className={styles.icon} />
             <input

@@ -193,6 +193,9 @@ export default function LoginModal({ onClose, setUser }: LoginModalProps) {
       const result = await signInWithPopup(auth, provider);
       setLocalUser(result.user);
       setUser(result.user);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('yogalink_user', JSON.stringify(result.user));
+      }
       setStep('loggedin');
     } catch (e: any) {
       setError(e.message);
@@ -208,6 +211,9 @@ export default function LoginModal({ onClose, setUser }: LoginModalProps) {
       const result = await signInWithEmailAndPassword(auth, email, password);
       setLocalUser(result.user);
       setUser(result.user);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('yogalink_user', JSON.stringify(result.user));
+      }
       setStep('loggedin');
     } catch (e: any) {
       setError(e.message);
@@ -218,6 +224,10 @@ export default function LoginModal({ onClose, setUser }: LoginModalProps) {
   const handleLogout = async () => {
     await signOut(auth);
     setLocalUser(null);
+    setUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('yogalink_user');
+    }
     setStep('main');
   };
 

@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import styles from './Navbar.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginModal from '../LoginModal/LoginModal';
 import AccountSettingsModal from '../AccountSettingsModal/AccountSettingsModal';
 
@@ -9,6 +9,17 @@ export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('yogalink_user');
+      if (stored) {
+        try {
+          setUser(JSON.parse(stored));
+        } catch {}
+      }
+    }
+  }, []);
 
   return (
     <nav className={styles.navbar}>

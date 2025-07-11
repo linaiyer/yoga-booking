@@ -94,7 +94,8 @@ export default function AccountSettingsModal({ user, onClose, setUser }: Account
 
   // Fetch user profile from Firestore on open
   useEffect(() => {
-    if (!user?.uid) { setLoading(false); return; }
+    if (!user) { setLoading(false); return; }
+    if (!user.uid) { setLoading(false); return; }
     const fetchProfile = async () => {
       const userRef = doc(db, 'users', user.uid);
       const snap = await getDoc(userRef);
@@ -133,6 +134,18 @@ export default function AccountSettingsModal({ user, onClose, setUser }: Account
   };
 
   if (loading) return null;
+  if (!user) {
+    return (
+      <>
+        <div style={overlayStyle} onClick={onClose} />
+        <div style={modalStyle} role="dialog" aria-modal="true">
+          <h2 style={{ fontWeight: 700, fontSize: 28, color: '#264A2E', textAlign: 'center', margin: '0 0 24px 0' }}>Account Settings</h2>
+          <div style={{ marginBottom: 16 }}>No user information available.</div>
+          <button type="button" style={textLink} onClick={onClose}>Close</button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

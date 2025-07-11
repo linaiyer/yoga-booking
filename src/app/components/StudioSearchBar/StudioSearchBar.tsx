@@ -78,7 +78,7 @@ export default function StudioSearchBar({ onSearch, initialLocation = '' }: { on
             aria-label="Set proximity"
             ref={pillButtonRef}
           >
-            Within {proximity} mi <span className={styles.pillArrow}>⌄</span>
+            Within {proximity} mi
           </button>
         </div>
         {showSlider && typeof window !== 'undefined' && popoverPosition && createPortal(

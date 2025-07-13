@@ -163,8 +163,9 @@ export default function StudiosClient() {
                       rating={studio.rating}
                       link={studio.url}
                       isSelected={selectedStudioUrl === studio.url}
-                      onClick={() => setSelectedStudioUrl(studio.url)}
-                      onDoubleClick={() => router.push(`/studios/${studio.id}`)}
+                      onMouseEnter={() => setSelectedStudioUrl(studio.url)}
+                      onMouseLeave={() => setSelectedStudioUrl(null)}
+                      onClick={() => router.push(`/studios/${studio.id}`)}
                     />
                   </div>
                 );

@@ -11,29 +11,17 @@ type StudioCardProps = {
   link?: string;
   isSelected?: boolean;
   onClick?: () => void;
-  onDoubleClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 };
 
-export default function StudioCard({ image, name, price, location, rating, features, link, isSelected, onClick, onDoubleClick }: StudioCardProps) {
-  let clickTimer: NodeJS.Timeout | null = null;
-
-  const handleClick = () => {
-    if (clickTimer) clearTimeout(clickTimer);
-    clickTimer = setTimeout(() => {
-      if (onClick) onClick();
-    }, 200);
-  };
-
-  const handleDoubleClick = () => {
-    if (clickTimer) clearTimeout(clickTimer);
-    if (onDoubleClick) onDoubleClick();
-  };
-
+export default function StudioCard({ image, name, price, location, rating, features, link, isSelected, onClick, onMouseEnter, onMouseLeave }: StudioCardProps) {
   return (
     <div
       className={styles.card + (isSelected ? ' ' + styles.selected : '')}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       style={{ cursor: onClick ? 'pointer' : undefined }}
     >
       <div style={{ position: 'relative' }}>

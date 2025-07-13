@@ -75,7 +75,7 @@ export default function StudioDetailPage() {
 
     // Create marker element
     const el = document.createElement('div');
-    el.style.background = '#4a5a40';
+    el.style.background = '#264A2E';
     el.style.borderRadius = '50%';
     el.style.width = '30px';
     el.style.height = '30px';

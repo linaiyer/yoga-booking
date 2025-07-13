@@ -45,7 +45,7 @@ export default function MapSection({ studios, selectedStudioUrl, setSelectedStud
     (mapRef.current as any)._studioMarkers = (studios || []).filter(s => s.latitude && s.longitude).map((studio) => {
       const isSelected = selectedStudioUrl === studio.url;
       const el = document.createElement('div');
-      el.style.background = isSelected ? '#4a5a40' : '#b7b7a4';
+      el.style.background = '#264A2E';
       el.style.borderRadius = '50%';
       el.style.width = isSelected ? '30px' : '22px';
       el.style.height = isSelected ? '30px' : '22px';
@@ -55,7 +55,7 @@ export default function MapSection({ studios, selectedStudioUrl, setSelectedStud
       el.style.color = '#fff';
       el.style.fontWeight = '700';
       el.style.fontSize = isSelected ? '20px' : '15px';
-      el.style.border = isSelected ? '3px solid #dde5b6' : '2px solid #4a5a40';
+      el.style.border = isSelected ? '3px solid #dde5b6' : '2px solid #264A2E';
       el.innerText = '🧘';
       el.style.transition = 'all 0.2s';
       el.onclick = () => {

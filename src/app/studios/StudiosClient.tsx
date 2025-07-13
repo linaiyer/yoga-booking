@@ -7,6 +7,18 @@ import StudioCard from '../components/StudioCard/StudioCard';
 import MapSection from '../components/MapSection/MapSection';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+// Haversine formula to calculate distance between two lat/lng points in miles
+function getDistanceFromLatLonInMiles(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 3958.8; // Radius of the earth in miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 export default function StudiosClient() {
   const [studios, setStudios] = useState<any[]>([]);
@@ -17,6 +29,7 @@ export default function StudiosClient() {
   const [searchLocation, setSearchLocation] = useState<string>('');
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [proximity, setProximity] = useState(10);
+  const [userCoords, setUserCoords] = useState<{lat: number, lng: number} | null>(null);
   const cardRefs = useRef<{ [url: string]: HTMLDivElement | null }>({});
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,6 +56,32 @@ export default function StudiosClient() {
     }
   }, [selectedStudioUrl]);
 
+  // Geocode the searchLocation to lat/lng (simple version: only on search)
+  useEffect(() => {
+    if (useCurrentLocation) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          () => setUserCoords(null)
+        );
+      }
+    } else if (searchLocation) {
+      // Use a geocoding API (replace with your own or a real one)
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchLocation)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            setUserCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
+          } else {
+            setUserCoords(null);
+          }
+        })
+        .catch(() => setUserCoords(null));
+    } else {
+      setUserCoords(null);
+    }
+  }, [searchLocation, useCurrentLocation]);
+
   // Show all studios by default if no search/filter is applied
   const filteredStudios = studios.filter((studio) => {
     // Rating
@@ -54,12 +93,15 @@ export default function StudiosClient() {
       const name = studio.name?.toLowerCase() || '';
       if (!tags.some(tag => name.includes(tag.toLowerCase()))) return false;
     }
-    // Location (simulate by searching in address)
-    if (searchLocation && !useCurrentLocation) {
+    // Proximity/location filter
+    if (userCoords && studio.coordinates) {
+      const dist = getDistanceFromLatLonInMiles(userCoords.lat, userCoords.lng, studio.coordinates.latitude, studio.coordinates.longitude);
+      if (dist > proximity) return false;
+    } else if (searchLocation) {
+      // Fallback: if geocoding failed, do substring match on address
       const address = studio.address?.toLowerCase() || '';
       if (!address.includes(searchLocation.toLowerCase())) return false;
     }
-    // Proximity (simulate by always passing for now)
     return true;
   });
 

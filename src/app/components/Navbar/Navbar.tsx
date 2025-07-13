@@ -116,7 +116,7 @@ export default function Navbar() {
                 fontWeight: 500,
                 borderRadius: 6,
                 transition: 'background 0.15s',
-              }} onClick={() => { setUser(null); setDropdownOpen(false); }} role="menuitem">Log out</button>
+              }} onClick={() => { setUser(null); localStorage.removeItem('yogalink_user'); setDropdownOpen(false); }} role="menuitem">Log out</button>
             </div>
           )}
         </div>

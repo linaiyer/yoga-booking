@@ -84,7 +84,7 @@
 .locWrap {
   position: relative;
   flex: 1 1 180px;
-  background: #f1f5f2;
+  background: transparent;
   border-radius: 0.75rem;
   padding: 0.5rem 1rem;
   display: flex;
